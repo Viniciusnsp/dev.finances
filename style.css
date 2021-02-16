@@ -31,6 +31,24 @@ body {
   width: min(90vw, 800px);
   margin: auto;
 }
+
+/* Error Message ===========================*/
+.error {
+  text-align: center;
+  background: #db524d;
+  padding: 15px;
+  color: #fff;
+  letter-spacing: 0.1rem;
+  font-weight: normal;
+  display: none;
+}
+.active-error {
+  display: block;
+  width: 100%;
+  z-index: 1000;
+  top: 0;
+  position: fixed;
+}
 /* Titles ===========================*/
 h2 {
   margin-top: 3.2rem;

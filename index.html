@@ -13,6 +13,9 @@
     <link rel="shortcut icon" href="./assets/total.svg" type="image/x-icon" />
   </head>
   <body>
+    <div class="error">
+      <h3>Por favor, preencha todos os campos!</h3>
+    </div>
     <header>
       <img src="./assets/logo.svg" alt="Logo dev.finance$" />
     </header>
@@ -89,7 +92,7 @@
       <div class="modal">
         <div id="form">
           <h2>Nova Transação</h2>
-          <form action="">
+          <form action="" onsubmit="Form.submit(event)">
             <div class="input-group">
               <label class="sr-only" for="description">Descrição</label>
               <input
@@ -122,7 +125,10 @@
             </div>
 
             <div class="input-group actions">
-              <a href="#" onclick="Modal.openClose()" class="button cancel"
+              <a
+                href="#"
+                onclick="Modal.openClose(), Modal.closeError()"
+                class="button cancel"
                 >Cancelar</a
               >
               <button>Salvar</button>

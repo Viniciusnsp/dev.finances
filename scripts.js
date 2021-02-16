@@ -3,43 +3,74 @@ const Modal = {
         //Abrindo e fechando o modal
         //Toggle verifica se a classe já existe - Se existir remove e se não existir adiciona
       document.querySelector(".modal-overlay").classList.toggle("active");
+    },
+    closeError() {
+        document.querySelector('.error').classList.remove('active-error');
     }
   }
 
-const transactions = [
-    {
-        id: 1,
-        description: 'Luz',
-        amount: -50000,
-        date: '23/01/2021'
-    },
-    {
-        id: 2,
-        description: 'Website',
-        amount: 500000,
-        date: '23/01/2021'
-    },
-    {
-        id: 3,
-        description: 'Internet',
-        amount: -20000,
-        date: '23/01/2021'
-    }, 
-]  
-
 const Transaction = {
+    all: [
+        {
+            description: 'Luz',
+            amount: -50000,
+            date: '23/01/2021'
+        },
+        {
+            description: 'Website',
+            amount: 500000,
+            date: '23/01/2021'
+        },
+        {
+            description: 'Internet',
+            amount: -20000,
+            date: '23/01/2021'
+        }, 
+    ]  ,
+
+    add(transaction) {
+        Transaction.all.push(transaction)
+
+        App.reload()
+    },
+    remove(index) {
+        Transaction.all.splice(index, 1)
+
+        App.reload()
+    },
     incomes() {
         //Somar as entradas
-        return "R$ 5000,00"
+        let income = 0
+        //pegar todas as transações
+        //para cada transação
+        Transaction.all.forEach(transaction => {
+            //se ela for maior que zero
+            if(transaction.amount > 0) {
+            //somar a variavel e retornar
+            income += transaction.amount
+            }
+        })
+        return income
         
     },
     expenses() {
         //Somar as saídas
-        return "R$ 5000,00"
+        let expense = 0
+        //Pegar todas as transações
+        //para cada transação
+        Transaction.all.forEach(transaction => {
+            //Se ela for menor que zero
+            if(transaction.amount < 0) {
+                //somar as saídas
+                expense += transaction.amount
+            }
+        })
+        return expense
     },
     total() {
         //Remover das entradas o valor das saídas para ter o saldo
-        return "R$ 5000,00"
+        //Diminuir as saídas das entradas
+        return Transaction.incomes() + Transaction.expenses()
     }
 }
 
@@ -76,9 +107,13 @@ const DOM = {
     },
     //Atualizando os valores na tela
     updateBalance() {
-        document.getElementById('incomeDisplay').innerHTML = Transaction.incomes()
-        document.getElementById('expenseDisplay').innerHTML = Transaction.expenses()
-        document.getElementById('totalDisplay').innerHTML = Transaction.total()
+        document.getElementById('incomeDisplay').innerHTML = Utils.formatCurrency(Transaction.incomes())
+        document.getElementById('expenseDisplay').innerHTML = Utils.formatCurrency(Transaction.expenses())
+        document.getElementById('totalDisplay').innerHTML = Utils.formatCurrency(Transaction.total())
+    },
+    //Limpando as transações
+    clearTransactions() {
+        DOM.transactionsContainer.innerHTML = ""
     }
 }
 
@@ -99,11 +134,66 @@ const Utils = {
     }
 }
 
-DOM.updateBalance()
+const Form = {
+    description: document.querySelector('#description'),
+    amount: document.querySelector('#amount'),
+    date: document.querySelector('#date'),
+    getValues() {
+        return {
+        description: Form.description.value,
+        amount: Form.amount.value,
+        date: Form.date.value
+        }
+    },
+    formatData() {},
 
-//Lendo cada elemento do array e executando uma funcionalidade
-transactions.forEach(function(transaction) {
-    DOM.addTransaction(transaction)
+    validateField() {
+        //desestruturando um objeto
+        const {description, amount, date} = Form.getValues()
+        
+        if(description.trim() === "" || amount.trim() === "" || date.trim() === ""){
+            throw new Error('Por favor, preencha todos os campos!')
+        }
+        document.querySelector('.error').classList.remove('active-error')
+    },
+    submit(event) {
+        event.preventDefault()
+        try {
+        //verificar se todos os campos foram preenchidos
+        Form.validateField()
+        //formatar os dados para salvar
+        Form.formatData()
+        //salvar
+        //Limpar os dados do formulario
+        //modal fecha
+        //Atualizar a aplicação
+        } catch (error) {
+            document.querySelector('.error').classList.add('active-error')
+        }
+    }
+}
 
+const App = {
+    init(){
+        //Lendo cada elemento do array e executando uma funcionalidade
+        Transaction.all.forEach(transaction => {
+            DOM.addTransaction(transaction)
+        })
+
+        DOM.updateBalance()
+    },
+    reload() {
+        DOM.clearTransactions()
+        App.init()
+    },
+}
+
+Transaction.add({
+    description:'Comida',
+    amount: 430,
+    date: '23/01/2021'
 })
+
+Transaction.remove()
+App.init()
 
